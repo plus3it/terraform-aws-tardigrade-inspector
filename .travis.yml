@@ -1,0 +1,74 @@
+language: node_js
+
+node_js:
+  - "8"
+
+git:
+  depth: 1
+
+env:
+  global:
+    - FIND_SH="find $TRAVIS_BUILD_DIR -name '*.sh' -type f -print0"
+    - FIND_JSON="find $TRAVIS_BUILD_DIR -name '*.json' -type f -print0"
+    - XARGS="xargs -0 -n1 -I {} -t"
+    - BIN_DIR="${HOME}/bin"
+    - TERRAFORM_DIR=`find . -type d -name "tf-*" | cut -d '/' -f 2`
+    - TERRAFORM_VERSION=`curl --fail -sSL https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M '.current_version'`
+
+stages:
+  - lint
+  - deploy
+
+jobs:
+  include:
+    - stage: lint
+      name: Shell Script Syntax Verification
+      script: eval $FIND_SH | $XARGS shellcheck {}
+    - stage: lint
+      name: JSON Syntax Verification
+      script: eval $FIND_JSON | $XARGS jq --exit-status . {} > /dev/null
+    - stage: lint
+      name: JSON Lint/Format Verification
+      script: eval $FIND_JSON | $XARGS bash -c 'cmp {} <(jq --indent 4 -S . {})'
+    - stage: lint
+      name: Terraform Validate/Format Verification
+      script:
+        - sudo apt-get install jq -y
+        - OS=`uname -s | tr '[:upper:]' '[:lower:']`
+        - echo "https://releases.hashicorp.com/terraform/$TERRAFORM_VERSION/terraform_${TERRAFORM_VERSION}_${OS}_amd64.zip"
+        - curl --fail -sSL -o terraform.zip https://releases.hashicorp.com/terraform/$TERRAFORM_VERSION/terraform_${TERRAFORM_VERSION}_${OS}_amd64.zip
+        - unzip terraform.zip && rm -f terraform.zip && chmod +x terraform
+        - mv terraform $BIN_DIR
+        - terraform --version
+        - terraform fmt -diff=true -check=true
+    - stage: lint
+      name: EditorConfig Syntax Verification
+      install:
+        - npm install -g eclint
+        - eclint --version
+      script: eclint check
+    - stage: deploy
+      if: branch = master AND type = push AND repo = plus3it/terraform-aws-tardigrade-inspector
+      before_script:
+        - |
+          PRIOR_VERSION=$(git describe --abbrev=0 --tags)
+          RELEASE_VERSION=$(grep current_version $TRAVIS_BUILD_DIR/.bumpversion.cfg | sed 's/^.*= //' )
+          RELEASE_BODY="* [TARDIGRADE-INSPECTOR v$RELEASE_VERSION CHANGELOG](https://github.com/plus3it/terraform-aws-tardigrade-inspector/blob/$RELEASE_VERSION/CHANGELOG.md)"
+          export PRIOR_VERSION RELEASE_VERSION RELEASE_BODY
+      script: skip
+      before_deploy:
+        - |
+          (set -x; git tag -a $RELEASE_VERSION -m $RELEASE_VERSION)
+      deploy:
+        provider: releases
+        api_key:
+          secure:
+        name: $RELEASE_VERSION
+        body: $RELEASE_BODY
+        tag_name: $RELEASE_VERSION
+        target_commitish: $TRAVIS_COMMIT
+        draft: false
+        on:
+          branch: master
+          repo: plus3it/terraform-aws-tardigrade-inspector
+          condition: '"$PRIOR_VERSION" != "$RELEASE_VERSION"'
