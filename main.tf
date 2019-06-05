@@ -2,8 +2,7 @@
 // Module: inspector
 //
 provider "aws" {
-  version = ">= 2.13.0"
-  region  = "${var.region}"
+  region = "${var.region}"
 }
 
 ### RESOURCES ###

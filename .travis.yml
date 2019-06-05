@@ -32,13 +32,13 @@ jobs:
       script: eval $FIND_JSON | $XARGS bash -c 'cmp {} <(jq --indent 4 -S . {})'
     - stage: lint
       name: Terraform Validate/Format Verification
-      script:
-        - sudo apt-get install jq -y
+      install:
         - OS=`uname -s | tr '[:upper:]' '[:lower:']`
         - echo "https://releases.hashicorp.com/terraform/$TERRAFORM_VERSION/terraform_${TERRAFORM_VERSION}_${OS}_amd64.zip"
         - curl --fail -sSL -o terraform.zip https://releases.hashicorp.com/terraform/$TERRAFORM_VERSION/terraform_${TERRAFORM_VERSION}_${OS}_amd64.zip
         - unzip terraform.zip && rm -f terraform.zip && chmod +x terraform
         - mv terraform $BIN_DIR
+      script:
         - terraform --version
         - terraform fmt -diff=true -check=true
     - stage: lint
