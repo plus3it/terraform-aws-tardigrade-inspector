@@ -11,9 +11,8 @@ env:
     - FIND_SH="find $TRAVIS_BUILD_DIR -name '*.sh' -type f -print0"
     - FIND_JSON="find $TRAVIS_BUILD_DIR -name '*.json' -type f -print0"
     - XARGS="xargs -0 -n1 -I {} -t"
-    - BIN_DIR="${HOME}/bin"
-    - TERRAFORM_DIR=`find . -type d -name "tf-*" | cut -d '/' -f 2`
-    - TERRAFORM_VERSION=`curl --fail -sSL https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M '.current_version'`
+    - BIN_DIR="$HOME/bin"
+    - PATH="$BIN_DIR:$PATH"
 
 stages:
   - lint
@@ -21,6 +20,12 @@ stages:
 
 jobs:
   include:
+    - stage: lint
+      name: EditorConfig Syntax Verification
+      install:
+        - npm install -g eclint
+        - eclint --version
+      script: eclint check
     - stage: lint
       name: Shell Script Syntax Verification
       script: eval $FIND_SH | $XARGS shellcheck {}
@@ -31,22 +36,14 @@ jobs:
       name: JSON Lint/Format Verification
       script: eval $FIND_JSON | $XARGS bash -c 'cmp {} <(jq --indent 4 -S . {})'
     - stage: lint
-      name: Terraform Validate/Format Verification
+      name: Syntax Verification
       install:
-        - OS=`uname -s | tr '[:upper:]' '[:lower:']`
-        - echo "https://releases.hashicorp.com/terraform/$TERRAFORM_VERSION/terraform_${TERRAFORM_VERSION}_${OS}_amd64.zip"
-        - curl --fail -sSL -o terraform.zip https://releases.hashicorp.com/terraform/$TERRAFORM_VERSION/terraform_${TERRAFORM_VERSION}_${OS}_amd64.zip
-        - unzip terraform.zip && rm -f terraform.zip && chmod +x terraform
-        - mv terraform $BIN_DIR
+        - make terraform/install
+        - make terraform-docs/install
+        - make pandoc/install
       script:
-        - terraform --version
-        - terraform fmt -diff=true -check=true
-    - stage: lint
-      name: EditorConfig Syntax Verification
-      install:
-        - npm install -g eclint
-        - eclint --version
-      script: eclint check
+        - make terraform/lint
+        - make docs/lint
     - stage: deploy
       if: branch = master AND type = push AND repo = plus3it/terraform-aws-tardigrade-inspector
       before_script:

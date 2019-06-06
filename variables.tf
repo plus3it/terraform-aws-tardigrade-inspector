@@ -6,6 +6,11 @@ variable "create_inspector" {
   default     = false
 }
 
+variable "iam_role_arn" {
+  description = "Controls whether to create the Inspector role"
+  default     = ""
+}
+
 variable "name" {
   description = "String to prefix resource names with"
   type        = "string"
@@ -27,9 +32,4 @@ variable "tags" {
   description = "Map of tags to apply to the resources"
   type        = "map"
   default     = {}
-}
-
-variable "region" {
-  description = "Region to deploy resources"
-  type        = "string"
 }

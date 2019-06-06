@@ -1,22 +1,25 @@
 //
 // Module: inspector
 //
-provider "aws" {
-  region = "${var.region}"
+provider "aws" {}
+
+locals {
+  iam_role_specified = "${var.iam_role_arn == ""}"
+  iam_role_arn       = "${local.iam_role_specified ? join("", aws_iam_role.this.*.arn) : var.iam_role_arn}"
 }
 
 ### RESOURCES ###
 # Create Inspector Assessment Target
 resource "aws_inspector_assessment_target" "this" {
   count = "${var.create_inspector ? 1 : 0}"
-  name  = "${var.name}_assessment_target"
+  name  = "${var.name}"
 }
 
 # Create Inspector Assessment Template
 resource "aws_inspector_assessment_template" "this" {
   count = "${var.create_inspector ? 1 : 0}"
 
-  name       = "${var.name}_assessment_template"
+  name       = "${var.name}"
   target_arn = "${aws_inspector_assessment_target.this.arn}"
   duration   = "${var.duration}"
 
@@ -29,7 +32,7 @@ resource "aws_inspector_assessment_template" "this" {
 resource "aws_cloudwatch_event_rule" "this" {
   count = "${var.create_inspector ? 1 : 0}"
 
-  name                = "${var.name}_inspector_scan"
+  name                = "${var.name}"
   description         = "Run inspector scan on a schedule"
   schedule_expression = "${var.schedule}"
   tags                = "${var.tags}"
@@ -37,26 +40,26 @@ resource "aws_cloudwatch_event_rule" "this" {
 
 # Create IAM Role
 resource "aws_iam_role" "this" {
-  count = "${var.create_inspector ? 1 : 0}"
+  count = "${var.create_inspector && local.iam_role_specified ? 1 : 0}"
 
-  name               = "${var.name}_cloudwatch_inspector_assume_role"
+  name               = "${var.name}"
   assume_role_policy = "${data.aws_iam_policy_document.assume_role.json}"
   tags               = "${var.tags}"
 }
 
 # Create IAM Policy
 resource "aws_iam_policy" "this" {
-  count = "${var.create_inspector ? 1 : 0}"
+  count = "${var.create_inspector && local.iam_role_specified ? 1 : 0}"
 
-  name   = "${var.name}_inspector_run_policy"
+  name   = "${var.name}"
   policy = "${data.aws_iam_policy_document.start_inspector.json}"
 }
 
 # Attach Policy to IAM Role
 resource "aws_iam_policy_attachment" "this" {
-  count = "${var.create_inspector ? 1 : 0}"
+  count = "${var.create_inspector && local.iam_role_specified ? 1 : 0}"
 
-  name       = "${var.name}_cloudwatch_inspector_policy_attachment"
+  name       = "${var.name}"
   roles      = ["${aws_iam_role.this.name}"]
   policy_arn = "${aws_iam_policy.this.arn}"
 }
@@ -67,7 +70,7 @@ resource "aws_cloudwatch_event_target" "this" {
 
   rule     = "${aws_cloudwatch_event_rule.this.name}"
   arn      = "${aws_inspector_assessment_template.this.arn}"
-  role_arn = "${aws_iam_role.this.arn}"
+  role_arn = "${local.iam_role_arn}"
 }
 
 ### DATA SOURCES ###

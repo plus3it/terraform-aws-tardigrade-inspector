@@ -1,5 +1,3 @@
-
-
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -17,3 +15,4 @@
 |------|-------------|
 | assessment\_target\_arn | Assessment target ARN |
 | assessment\_template\_arn | Assessment template ARN |
+
