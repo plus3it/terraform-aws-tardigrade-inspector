@@ -1,4 +1,4 @@
-
+# terraform-aws-tardigrade-inspector
 
 ## Inputs
 
@@ -17,3 +17,4 @@
 |------|-------------|
 | assessment\_target\_arn | Assessment target ARN |
 | assessment\_template\_arn | Assessment template ARN |
+
