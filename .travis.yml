@@ -40,7 +40,6 @@ jobs:
       install:
         - make terraform/install
         - make terraform-docs/install
-        - make pandoc/install
       script:
         - make terraform/lint
         - make docs/lint
