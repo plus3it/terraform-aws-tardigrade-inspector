@@ -1,18 +1,9 @@
+dist: xenial
+
 language: node_js
 
 node_js:
   - "8"
-
-git:
-  depth: 1
-
-env:
-  global:
-    - FIND_SH="find $TRAVIS_BUILD_DIR -name '*.sh' -type f -print0"
-    - FIND_JSON="find $TRAVIS_BUILD_DIR -name '*.json' -type f -print0"
-    - XARGS="xargs -0 -n1 -I {} -t"
-    - BIN_DIR="$HOME/bin"
-    - PATH="$BIN_DIR:$PATH"
 
 stages:
   - lint
@@ -28,15 +19,12 @@ jobs:
       script: eclint check
     - stage: lint
       name: Shell Script Syntax Verification
-      script: eval $FIND_SH | $XARGS shellcheck {}
-    - stage: lint
-      name: JSON Syntax Verification
-      script: eval $FIND_JSON | $XARGS jq --exit-status . {} > /dev/null
+      script: make sh/lint
     - stage: lint
       name: JSON Lint/Format Verification
-      script: eval $FIND_JSON | $XARGS bash -c 'cmp {} <(jq --indent 4 -S . {})'
+      script: make json/lint
     - stage: lint
-      name: Syntax Verification
+      name: Terraform Lint/Format Verification
       install:
         - make terraform/install
         - make terraform-docs/install
