@@ -11,6 +11,7 @@ import (
 
 func TestModule(t *testing.T) {
 	files, err := ioutil.ReadDir("./")
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -18,31 +19,40 @@ func TestModule(t *testing.T) {
 	for _, f := range files {
 		// look for directories with test cases in it
 		if f.IsDir() && f.Name() != "vendor" {
-			// see if a prereq directory exists
-			if _, err := os.Stat(f.Name() + "/prereq/"); err == nil {
-				directory := f.Name() + "/prereq/"
-				// create the resources but don't destroy it. Let the overarching test take care of that
-				runTerraform(t, directory, false)
-			}
-
-			// run terraform code
-			runTerraform(t, f.Name(), true)
+			investigateDirectory(t, f)
 		}
 	}
 }
 
-// The prequisite function runs the terraform code but doesn't destroy it afterwards so that the state can be used for further testing
-func runTerraform(t *testing.T, directory string, destroyInfra bool) {
+func investigateDirectory(t *testing.T, directory os.FileInfo) {
+	// check if a prereq directory exists
+	if _, err := os.Stat(directory.Name() + "/prereq/"); err == nil {
+		prereqDir := directory.Name() + "/prereq/"
+		prereqOptions := createTerraformOptions(prereqDir)
+		defer terraform.Destroy(t, prereqOptions)
+		runTerraform(t, prereqOptions, false)
+	}
+
+	// run terraform code for test case
+	terraformOptions := createTerraformOptions(directory.Name())
+	runTerraform(t, terraformOptions, true)
+}
+
+func createTerraformOptions(directory string) *terraform.Options {
 	terraformOptions := &terraform.Options{
 		TerraformDir: directory,
 		NoColor:      true,
 	}
 
+	return terraformOptions
+}
+
+func runTerraform(t *testing.T, options *terraform.Options, destroyInfra bool) {
 	// At the end of the test, run `terraform destroy` to clean up any resources that were created
 	if destroyInfra {
-		defer terraform.Destroy(t, terraformOptions)
+		defer terraform.Destroy(t, options)
 	}
 
 	// This will run `terraform init` and `terraform apply` and fail the test if there are any errors
-	terraform.InitAndApply(t, terraformOptions)
+	terraform.InitAndApply(t, options)
 }
