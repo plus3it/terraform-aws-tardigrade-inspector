@@ -5,3 +5,6 @@ terraform.tfstate*
 
 # ignore go files
 vendor/
+
+# ignore any dynamic files generated for building
+scripts/

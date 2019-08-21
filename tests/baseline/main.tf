@@ -1,8 +1,4 @@
-terraform {
-  required_version  = "~> 0.11.0"
-}
-
-provider aws {
+provider "aws" {
   region = "us-east-1"
 }
 
@@ -15,11 +11,12 @@ module "inspector" {
   source = "../../"
 
   providers = {
-    aws = "aws"
+    aws = aws
   }
 
   create_inspector = true
-  name             = "${random_id.name.hex}"
+  name             = random_id.name.hex
   schedule         = "rate(7 days)"
   duration         = "180"
 }
+

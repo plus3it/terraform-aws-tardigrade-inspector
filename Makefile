@@ -5,6 +5,7 @@ XARGS ?= xargs -I {}
 BIN_DIR ?= ${HOME}/bin
 TMP ?= /tmp
 FIND_EXCLUDES ?= -not \( -name .terraform -prune \) -not \( -name .terragrunt-cache -prune \)
+SCRIPTS_DIR ?= scripts
 
 PATH := $(BIN_DIR):${PATH}
 
@@ -36,6 +37,10 @@ guard/program/%:
 	@ which $* > /dev/null || $(MAKE) $*/install
 
 $(BIN_DIR):
+	@ echo "[make]: Creating directory '$@'..."
+	mkdir -p $@
+
+$(SCRIPTS_DIR):
 	@ echo "[make]: Creating directory '$@'..."
 	mkdir -p $@
 
@@ -100,15 +105,21 @@ json/format: | guard/program/jq
 	$(FIND_JSON) | $(XARGS) bash -c 'echo "$$(jq --indent 4 -S . "{}")" > "{}"'
 	@ echo "[$@]: Successfully formatted JSON files!"
 
-docs/%: README_PARTS := _docs/MAIN.md <(echo) <(terraform-docs markdown table .)
+tfdocs-awk/install: $(SCRIPTS_DIR)
+tfdocs-awk/install: ARCHIVE := https://github.com/plus3it/tfdocs-awk/archive/master.tar.gz
+tfdocs-awk/install:
+	$(CURL) $(ARCHIVE) | tar -C $(SCRIPTS_DIR) --strip-components=1 --wildcards '*.sh' --wildcards '*.awk' -xzvf -
+	chmod -R 755 $(SCRIPTS_DIR)/*
+
+docs/%: README_PARTS := _docs/MAIN.md <(echo) <(./scripts/terraform-docs.sh markdown table .)
 docs/%: README_FILE ?= README.md
 
-docs/lint: | guard/program/terraform-docs
+docs/lint: | guard/program/terraform-docs tfdocs-awk/install
 	@ echo "[$@]: Linting documentation files.."
 	diff $(README_FILE) <(cat $(README_PARTS))
 	@ echo "[$@]: Documentation files PASSED lint test!"
 
-docs/generate: | guard/program/terraform-docs
+docs/generate: | guard/program/terraform-docs tfdocs-awk/install
 	@ echo "[$@]: Creating documentation files.."
 	cat $(README_PARTS) > $(README_FILE)
 	@ echo "[$@]: Documentation files creation complete!"

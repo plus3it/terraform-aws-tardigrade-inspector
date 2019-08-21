@@ -1,4 +1,4 @@
-provider aws {
+provider "aws" {
   region = "us-east-1"
 }
 
@@ -8,13 +8,13 @@ resource "random_id" "name" {
 }
 
 resource "aws_iam_role" "test" {
-  name               = "${random_id.name.hex}"
-  assume_role_policy = "${data.aws_iam_policy_document.assume_role_test.json}"
+  name               = random_id.name.hex
+  assume_role_policy = data.aws_iam_policy_document.assume_role_test.json
 }
 
 resource "aws_iam_policy" "test" {
-  name   = "${random_id.name.hex}"
-  policy = "${data.aws_iam_policy_document.start_inspector_test.json}"
+  name   = random_id.name.hex
+  policy = data.aws_iam_policy_document.start_inspector_test.json
 }
 
 data "aws_iam_policy_document" "assume_role_test" {
@@ -36,8 +36,10 @@ data "aws_iam_policy_document" "start_inspector_test" {
 }
 
 output "random_name" {
-  value = "${random_id.name.hex}"
+  value = random_id.name.hex
 }
+
 output "iam_role_arn" {
-  value = "${aws_iam_role.test.arn}"
+  value = aws_iam_role.test.arn
 }
+
