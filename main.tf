@@ -10,6 +10,19 @@ locals {
 }
 
 ### RESOURCES ###
+
+# Race condition on resource cycles requires some randomness in the name to avoid "name already exists" errors
+resource "random_uuid" "assessment_template" {
+  count = var.create_inspector ? 1 : 0
+
+  keepers = {
+    rules_package_arns = join(",", data.aws_inspector_rules_packages.this.arns)
+    duration           = var.duration
+    target_arn         = aws_inspector_assessment_target.this[0].arn
+
+  }
+}
+
 # Create Inspector Assessment Target
 resource "aws_inspector_assessment_target" "this" {
   count = var.create_inspector ? 1 : 0
@@ -20,11 +33,11 @@ resource "aws_inspector_assessment_target" "this" {
 resource "aws_inspector_assessment_template" "this" {
   count = var.create_inspector ? 1 : 0
 
-  name       = var.name
-  target_arn = aws_inspector_assessment_target.this[0].arn
-  duration   = var.duration
+  name       = "${var.name} ${random_uuid.assessment_template[0].result}"
+  target_arn = random_uuid.assessment_template[0].keepers.target_arn
+  duration   = random_uuid.assessment_template[0].keepers.duration
 
-  rules_package_arns = data.aws_inspector_rules_packages.this.arns
+  rules_package_arns = split(",", random_uuid.assessment_template[0].keepers.rules_package_arns)
 }
 
 # Create Cloudwatch Event Rule
