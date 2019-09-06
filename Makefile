@@ -118,11 +118,12 @@ docs/generate: | guard/program/terraform-docs tfdocs-awk/install
 	cat $(README_PARTS) > $(README_FILE)
 	@ echo "[$@]: Documentation files creation complete!"
 
-dep/install: guard/program/curl
-	curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+terratest/install: | guard/program/go
+	cd tests && go mod init terraform-aws-tardigrade-inspector/tests
+	cd tests && go build ./...
+	cd tests && go mod tidy
 
-terratest/install: | guard/program/go guard/program/dep
-	cd tests && dep ensure
-
-terratest/test: | guard/program/go guard/program/dep
+terratest/test: | guard/program/go
 	cd tests && go test -timeout 20m
+
+test: terratest/test
