@@ -7,7 +7,7 @@ resource "random_id" "name" {
   prefix      = "terraform-aws-inspector-"
 }
 
-module "inspector" {
+module "baseline" {
   source = "../../"
 
   providers = {

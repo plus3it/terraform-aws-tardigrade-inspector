@@ -9,7 +9,7 @@ data "terraform_remote_state" "prereq" {
   }
 }
 
-module "inspector" {
+module "premade_policy" {
   source = "../../"
 
   providers = {
