@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+### 1.0.2
+
+**Commit Delta**: https://github.com/plus3it/terraform-aws-tardigrade-inspector/compare/1.0.1...1.0.2
+
+**Released**: 2019.09.19
+
+**Summary**:
+
+*   Re-enable dependabot and add additional configurations
+*   Add an additional test
+*   Update go module versions
+
 ### 1.0.1
 
 **Commit Delta**: https://github.com/plus3it/terraform-aws-tardigrade-inspector/compare/1.0.0...1.0.1
