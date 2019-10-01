@@ -5,3 +5,6 @@ terraform.tfstate*
 
 # ignore go files
 vendor/
+
+# ignore log files
+*.log
