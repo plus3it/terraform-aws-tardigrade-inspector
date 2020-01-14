@@ -5,7 +5,7 @@
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
 | create\_inspector | Controls whether to create the Inspector resources | string | `"true"` | no |
-| duration | Maximum time the Inspector assessment will run for (in seconds) | string | `"3600"` | no |
+| duration | Maximum time the Inspector assessment will run for \(in seconds\) | string | `"3600"` | no |
 | iam\_role\_arn | Controls whether to create the Inspector role | string | `"null"` | no |
 | name | String to prefix resource names with | string | n/a | yes |
 | schedule | Rate expression for CloudWatch event | string | `"rate(7 days)"` | no |
