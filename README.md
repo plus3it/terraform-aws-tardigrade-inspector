@@ -1,5 +1,6 @@
 # terraform-aws-tardigrade-inspector
 
+<!-- BEGIN TFDOCS -->
 ## Providers
 
 | Name | Version |
@@ -25,3 +26,4 @@
 | assessment\_target\_arn | Assessment target ARN |
 | assessment\_template\_arn | Assessment template ARN |
 
+<!-- END TFDOCS -->
