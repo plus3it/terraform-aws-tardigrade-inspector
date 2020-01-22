@@ -116,20 +116,18 @@ json/format: | guard/program/jq
 	$(FIND_JSON) | $(XARGS) bash -c 'echo "$$(jq --indent 4 -S . "{}")" > "{}"'
 	@ echo "[$@]: Successfully formatted JSON files!"
 
-tfdocs-awk/install: $(BIN_DIR)
-tfdocs-awk/install: ARCHIVE := https://github.com/plus3it/tfdocs-awk/archive/0.0.0.tar.gz
-tfdocs-awk/install:
-	$(CURL) $(ARCHIVE) | tar -C $(BIN_DIR) --strip-components=1 --wildcards '*.sh' --wildcards '*.awk' -xzvf -
+docs/%: README_PARTS := _docs/MAIN.md <(echo) <(terraform-docs --sort-by-required markdown table .)
+docs/%: README_FILE ?= README.md
 
-docs/generate: | tfdocs-awk/install guard/program/terraform-docs
+docs/generate: | guard/program/terraform-docs
 	@ echo "[$@]: Creating documentation files.."
-	@ bash -eu -o pipefail autodocs.sh -g
-	@ echo "[$@]: Documentation generated!"
+	cat $(README_PARTS) > $(README_FILE)
+	@ echo "[$@]: Documentation files creation complete!"
 
-docs/lint: | tfdocs-awk/install guard/program/terraform-docs
-	@ echo "[$@] Linting documentation files.."
-	@ bash -eu -o pipefail autodocs.sh -l
-	@ echo "[$@] documentation linting complete!"
+docs/lint: | guard/program/terraform-docs
+	@ echo "[$@]: Linting documentation files.."
+	diff $(README_FILE) <(cat $(README_PARTS))
+	@ echo "[$@]: Documentation files PASSED lint test!"
 
 python/lint: | guard/program/black
 	@ echo "[$@]: Linting Python files..."
