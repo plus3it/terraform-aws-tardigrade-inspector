@@ -116,20 +116,33 @@ json/format: | guard/program/jq
 	$(FIND_JSON) | $(XARGS) bash -c 'echo "$$(jq --indent 4 -S . "{}")" > "{}"'
 	@ echo "[$@]: Successfully formatted JSON files!"
 
-tfdocs-awk/install: $(BIN_DIR)
-tfdocs-awk/install: ARCHIVE := https://github.com/plus3it/tfdocs-awk/archive/0.0.0.tar.gz
-tfdocs-awk/install:
-	$(CURL) $(ARCHIVE) | tar -C $(BIN_DIR) --strip-components=1 --wildcards '*.sh' --wildcards '*.awk' -xzvf -
+docs/%: TFDOCS ?= terraform-docs --sort-by-required markdown table
+docs/%: README_FILES ?= find . -type f -name README.md
+docs/%: README_TMP ?= $(TMP)/README.tmp
+docs/%: TFDOCS_START_MARKER ?= <!-- BEGIN TFDOCS -->
+docs/%: TFDOCS_END_MARKER ?= <!-- END TFDOCS -->
 
-docs/generate: | tfdocs-awk/install guard/program/terraform-docs
+docs/tmp/%: | guard/program/terraform-docs
+	sed '/$(TFDOCS_START_MARKER)/,/$(TFDOCS_END_MARKER)/{//!d}' $* | awk '{print $$0} /$(TFDOCS_START_MARKER)/ {system("$(TFDOCS) $$(dirname $*)")} /$(TFDOCS_END_MARKER)/ {f=1}' > $(README_TMP)
+
+docs/generate/%:
 	@ echo "[$@]: Creating documentation files.."
-	@ bash -eu -o pipefail autodocs.sh -g
-	@ echo "[$@]: Documentation generated!"
+	@ $(MAKE) docs/tmp/$*
+	mv -f $(README_TMP) $*
+	@ echo "[$@]: Documentation files creation complete!"
 
-docs/lint: | tfdocs-awk/install guard/program/terraform-docs
-	@ echo "[$@] Linting documentation files.."
-	@ bash -eu -o pipefail autodocs.sh -l
-	@ echo "[$@] documentation linting complete!"
+docs/lint/%:
+	@ echo "[$@]: Linting documentation files.."
+	@ $(MAKE) docs/tmp/$*
+	diff $* $(README_TMP)
+	rm -f $(README_TMP)
+	@ echo "[$@]: Documentation files PASSED lint test!"
+
+docs/generate:
+	@ $(README_FILES) | $(XARGS) $(MAKE) docs/generate/{}
+
+docs/lint:
+	@ $(README_FILES) | $(XARGS) $(MAKE) docs/lint/{}
 
 python/lint: | guard/program/black
 	@ echo "[$@]: Linting Python files..."
