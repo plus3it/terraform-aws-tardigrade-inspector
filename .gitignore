@@ -8,3 +8,11 @@ vendor/
 
 # ignore log files
 *.log
+
+# tardigrade-ci
+.tardigrade-ci
+tardigrade-ci/
+
+# eclint
+.git/
+
