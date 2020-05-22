@@ -23,9 +23,15 @@ variable "duration" {
 }
 
 variable "schedule" {
-  description = "Rate expression for CloudWatch event"
+  description = "Rate expression for CloudWatch event. Required if not setting an event_pattern"
   type        = string
-  default     = "rate(7 days)"
+  default     = null
+}
+
+variable "event_pattern" {
+  description = "JSON object describing an event to capture. Required if not setting a schedule. See AWS documentation for more details - https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/CloudWatchEventsandEventPatterns.html"
+  type        = string
+  default     = null
 }
 
 variable "tags" {

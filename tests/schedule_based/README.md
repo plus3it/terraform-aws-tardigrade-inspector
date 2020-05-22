@@ -1,4 +1,4 @@
-# Don't Create Resources Test
+# Baseline Test
 
 <!-- BEGIN TFDOCS -->
 ## Requirements
@@ -7,7 +7,9 @@ No requirements.
 
 ## Providers
 
-No provider.
+| Name | Version |
+|------|---------|
+| random | n/a |
 
 ## Inputs
 

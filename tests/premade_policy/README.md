@@ -3,9 +3,7 @@
 <!-- BEGIN TFDOCS -->
 ## Requirements
 
-| Name | Version |
-|------|---------|
-| terraform | >= 0.12 |
+No requirements.
 
 ## Providers
 
