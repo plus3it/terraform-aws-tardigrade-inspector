@@ -1,8 +1,4 @@
-//
-// Module: inspector
-//
-provider "aws" {
-}
+provider "aws" {}
 
 locals {
   create_iam_role = var.iam_role_arn == null
@@ -47,6 +43,7 @@ resource "aws_cloudwatch_event_rule" "this" {
   name                = var.name
   description         = "Run inspector scan on a schedule"
   schedule_expression = var.schedule
+  event_pattern       = var.event_pattern
   tags                = var.tags
 }
 
@@ -68,11 +65,10 @@ resource "aws_iam_policy" "this" {
 }
 
 # Attach Policy to IAM Role
-resource "aws_iam_policy_attachment" "this" {
+resource "aws_iam_role_policy_attachment" "this" {
   count = var.create_inspector && local.create_iam_role ? 1 : 0
 
-  name       = var.name
-  roles      = [aws_iam_role.this[0].name]
+  role       = aws_iam_role.this[0].name
   policy_arn = aws_iam_policy.this[0].arn
 }
 

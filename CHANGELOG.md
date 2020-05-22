@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+### 1.1.0
+
+**Commit Delta**: [Change from 1.0.6 release](https://github.com/plus3it/terraform-aws-tardigrade-inspector/compare/1.0.6...1.1.0)
+
+**Released**: 2020.05.22
+
+**Summary**:
+
+*   Adds ability to create an inspector scan based on an event_pattern
+
 ### 1.0.6
 
 **Commit Delta**: [Change from 1.0.5 release](https://github.com/plus3it/terraform-aws-tardigrade-inspector/compare/1.0.5...1.0.6)

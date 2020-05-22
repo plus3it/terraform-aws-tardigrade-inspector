@@ -7,7 +7,7 @@ resource "random_id" "name" {
   prefix      = "terraform-aws-inspector-"
 }
 
-module "baseline" {
+module "event_based" {
   source = "../../"
 
   providers = {
@@ -17,6 +17,15 @@ module "baseline" {
   create_inspector = true
   name             = random_id.name.hex
   schedule         = "rate(7 days)"
+  event_pattern    = <<-EOF
+    {
+      "source" : ["aws.ec2"],
+      "detail-type" : ["EC2 Instance State-change Notification"],
+      "detail" : {
+        "state" : ["running"]
+      }
+    }
+  EOF
   duration         = "180"
 }
 
