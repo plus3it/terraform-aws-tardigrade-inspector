@@ -10,11 +10,13 @@ resource "random_id" "name" {
 module "event_based" {
   source = "../../"
 
+ 
   providers = {
     aws = aws
   }
+ 
 
-  create_inspector = true
+  # create_inspector = true
   name             = random_id.name.hex
   schedule         = "rate(7 days)"
   event_pattern    = <<-EOF
