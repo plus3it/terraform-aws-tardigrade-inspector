@@ -1,8 +1,7 @@
-/*
 provider "aws" {
   region = "us-east-1"
 }
-*/
+
 resource "random_id" "name" {
   byte_length = 6
   prefix      = "terraform-aws-inspector-"
@@ -10,14 +9,10 @@ resource "random_id" "name" {
 
 module "scheduled_run" {
   source = "../../"
-/*
-  providers = {
-    aws = aws
-  }
-*/
+
   # create_inspector = true
-  name             = random_id.name.hex
-  schedule         = "rate(7 days)"
-  duration         = "180"
+  name     = random_id.name.hex
+  schedule = "rate(7 days)"
+  duration = "180"
 }
 
