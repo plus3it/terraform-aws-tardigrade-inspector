@@ -10,7 +10,6 @@ resource "random_id" "name" {
 module "scheduled_run" {
   source = "../../"
 
-  # create_inspector = true
   name     = random_id.name.hex
   schedule = "rate(7 days)"
   duration = "180"
