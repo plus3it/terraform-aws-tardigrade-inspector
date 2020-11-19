@@ -10,7 +10,7 @@ data "terraform_remote_state" "prereq" {
 }
 
 module "premade_policy" {
-  source       = "../../"
+  source = "../../"
   name         = data.terraform_remote_state.prereq.outputs.random_name
   schedule     = "rate(7 days)"
   duration     = "180"
