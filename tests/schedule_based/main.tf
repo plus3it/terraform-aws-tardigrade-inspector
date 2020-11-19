@@ -10,13 +10,8 @@ resource "random_id" "name" {
 module "scheduled_run" {
   source = "../../"
 
-  providers = {
-    aws = aws
-  }
-
-  create_inspector = true
-  name             = random_id.name.hex
-  schedule         = "rate(7 days)"
-  duration         = "180"
+  name     = random_id.name.hex
+  schedule = "rate(7 days)"
+  duration = "180"
 }
 

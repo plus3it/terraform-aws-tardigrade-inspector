@@ -10,13 +10,8 @@ resource "random_id" "name" {
 module "event_based" {
   source = "../../"
 
-  providers = {
-    aws = aws
-  }
-
-  create_inspector = true
-  name             = random_id.name.hex
-  event_pattern    = <<-EOF
+  name          = random_id.name.hex
+  event_pattern = <<-EOF
     {
       "source" : ["aws.ec2"],
       "detail-type" : ["EC2 Instance State-change Notification"],
@@ -25,6 +20,6 @@ module "event_based" {
       }
     }
   EOF
-  duration         = "180"
+  duration      = "180"
 }
 

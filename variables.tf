@@ -1,10 +1,6 @@
 //
 // Module: inspector
 //
-variable "create_inspector" {
-  description = "Controls whether to create the Inspector resources"
-  default     = true
-}
 
 variable "iam_role_arn" {
   description = "Controls whether to create the Inspector role"
