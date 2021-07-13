@@ -1,20 +1,19 @@
-.git/
+#  Local .terraform directories
 .terraform/
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# .tfvars files
 *.tfvars
-terraform.tfstate*
-
-# ignore go files
-vendor/
-
-# ignore log files
-*.log
 
 # tardigrade-ci
-.tardigrade-ci
 tardigrade-ci/
+.tardigrade-ci
 
-# eclint
-.git/
+# terraform lock file
+.terraform.lock.hcl
 
-# terratest
-tests/go.*
+# Cache created by pytest
+tests/__pycache__/
