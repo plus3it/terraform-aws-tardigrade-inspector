@@ -17,9 +17,9 @@ resource "random_uuid" "assessment_template" {
 
 # Adding random string to assessment target name
 resource "random_string" "random_suffix" {
-    length = 6
-    special = false
-    upper   = false
+  length = 6
+  special = false
+  upper   = false
 }
 
 # Create Inspector Assessment Target
