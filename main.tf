@@ -24,7 +24,7 @@ resource "random_string" "random_suffix" {
 
 # Create Inspector Assessment Target
 resource "aws_inspector_assessment_target" "this" {
-  name = "$(var.name)-$(random_string.random_prefix.result)"
+  name = "${var.name}-${random_string.random_prefix.result}"
 }
 
 # Create Inspector Assessment Template
