@@ -15,9 +15,16 @@ resource "random_uuid" "assessment_template" {
   }
 }
 
+# Adding random string to assessment target name
+resource "random_string" "random_suffix" {
+    length = 6
+    special = false
+    upper   = false
+}
+
 # Create Inspector Assessment Target
 resource "aws_inspector_assessment_target" "this" {
-  name = var.name
+  name = "$(var.name)-$(random_string.random_prefix.result)"
 }
 
 # Create Inspector Assessment Template
