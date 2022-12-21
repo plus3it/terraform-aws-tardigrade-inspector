@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+### 3.0.0
+**Commit Delta**: [Change from 2.0.0 release](https://github.com/plus3it/terraform-aws-tardigrade-inspector/compare/2.0.0...3.0.0)
+
+**Released**: 2022.12.20
+
+**Summary**
+
+* Added random string generator
+* Added suffix using the random string generator to the inspector target name
+
 ### 1.1.0
 
 **Commit Delta**: [Change from 1.0.6 release](https://github.com/plus3it/terraform-aws-tardigrade-inspector/compare/1.0.6...1.1.0)
