@@ -16,17 +16,27 @@ updates:
       interval: daily
     open-pull-requests-limit: 10
   - package-ecosystem: terraform
-    directory: "/tests/no_create"
+    directory: "/tests/event_and_schedule"
     schedule:
       interval: daily
     open-pull-requests-limit: 10
   - package-ecosystem: terraform
-    directory: "/tests/premade-policy"
+    directory: "/tests/event_based"
     schedule:
       interval: daily
     open-pull-requests-limit: 10
   - package-ecosystem: terraform
-    directory: "/tests/baseline"
+    directory: "/tests/premade_policy"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 10
+  - package-ecosystem: terraform
+    directory: "/tests/premade_policy/prereq"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 10
+  - package-ecosystem: terraform
+    directory: "/tests/schedule_based"
     schedule:
       interval: daily
     open-pull-requests-limit: 10
